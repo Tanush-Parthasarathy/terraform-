@@ -117,14 +117,7 @@ variable "linux_instance_types" {
 
 
 
-variable "os_type" {
-  description = "Specify the operating system type: 'windows' or 'linux'"
-  type        = string
-  validation {
-    condition     = var.os_type == "windows" || var.os_type == "linux"
-    error_message = "Os_type must be either 'windows' or 'linux'"
-  }
-}
+
 
 variable "prompt_for_input" {
   description = "Flag to prompt the user for input"
