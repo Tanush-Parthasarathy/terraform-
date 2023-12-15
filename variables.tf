@@ -108,12 +108,6 @@ variable "windows_instance_types" {
 
 }
 
-# Linux Instance Types
-variable "linux_instance_types" {
-  description = "List of available Linux virtual machine sizes."
-  type        = list(string)
-  default     = ["Standard_DS2_v2", "Standard_DS4_v2", "Standard_DS8_v2"]
-}
 
 
 
