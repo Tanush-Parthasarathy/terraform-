@@ -37,6 +37,7 @@ jobs:
         steps:
         - download: current
           artifact: 'terraform-artifact'
+          displayName: 'Download Terraform Artifact'
         - script: |
             cd $(Pipeline.Workspace)/_work/*/terraform-artifact/path/to/your/terraform/code
             terraform apply -auto-approve $(Pipeline.Workspace)/_work/*/terraform-artifact/tfplan
