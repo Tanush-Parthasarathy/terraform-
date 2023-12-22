@@ -18,6 +18,7 @@ jobs:
   - script: |
       cd $(Build.SourcesDirectory)/path/to/your/terraform/code
       terraform init
+      terraform validate
       terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
     displayName: 'Terraform Init and Plan'
 
@@ -28,7 +29,7 @@ jobs:
       publishLocation: 'pipeline'
 
 - deployment: 'TerraformApply'
-  dependsOn: 'TerraformInitPlan'  # Ensure TerraformInitPlan completes before TerraformApply starts
+  dependsOn: 'TerraformInitPlan'
   pool:
     vmImage: 'ubuntu-latest'
   environment: 'YourEnvironmentName'  # Create an environment in Azure DevOps
