@@ -28,6 +28,7 @@ jobs:
       publishLocation: 'pipeline'
 
 - deployment: 'TerraformApply'
+  dependsOn: 'TerraformInitPlan'  # Ensure TerraformInitPlan completes before TerraformApply starts
   pool:
     vmImage: 'ubuntu-latest'
   environment: 'YourEnvironmentName'  # Create an environment in Azure DevOps
@@ -40,6 +41,5 @@ jobs:
           displayName: 'Download Terraform Artifact'
         - script: |
             cd $(Pipeline.Workspace)/terraform-artifact
-            terraform init
             terraform apply -auto-approve tfplan
           displayName: 'Terraform Apply'
