@@ -40,5 +40,6 @@ jobs:
           displayName: 'Download Terraform Artifact'
         - script: |
             cd $(Pipeline.Workspace)/terraform-artifact
+            terraform init
             terraform apply -auto-approve tfplan
           displayName: 'Terraform Apply'
