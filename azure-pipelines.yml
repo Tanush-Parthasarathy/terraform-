@@ -1,5 +1,5 @@
 trigger:
-- main  # Change this to your branch name
+- main  # Change this to your branch name if needed
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -18,7 +18,7 @@ jobs:
   - script: |
       cd $(Build.SourcesDirectory)/path/to/your/terraform/code
       terraform init
-      terraform plan -out=$(Build.ArtifactStagingDirectory)/tfplan
+      terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
     displayName: 'Terraform Init and Plan'
 
   - task: PublishPipelineArtifact@1
@@ -37,7 +37,8 @@ jobs:
         steps:
         - download: current
           artifact: 'terraform-artifact'
+          displayName: 'Download Terraform Artifact'
         - script: |
-            cd $(Pipeline.Workspace)/_work/*/terraform-artifact/path/to/your/terraform/code
-            terraform apply -auto-approve $(Pipeline.Workspace)/_work/*/terraform-artifact/tfplan
+            cd $(Pipeline.Workspace)/terraform-artifact
+            terraform apply -auto-approve tfplan
           displayName: 'Terraform Apply'
