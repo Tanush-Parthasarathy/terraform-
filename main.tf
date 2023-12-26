@@ -34,7 +34,7 @@ resource "azurerm_virtual_network" "example" {
   name                = "virtual_network_name"
   resource_group_name = data.azurerm_resource_group.existing.name
   location            = data.azurerm_resource_group.existing.location
-  address_space       = ["10.0.0.0/16"]
+  address_prefix       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "public_subnet" {
@@ -42,7 +42,7 @@ resource "azurerm_subnet" "public_subnet" {
   name                 = "public-subnet-${count.index + 1}"
   resource_group_name  = data.azurerm_resource_group.existing.name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.0.${count.index + 1}.0/24"]
+  address_prefix     = ["10.0.${count.index + 1}.0/24"]
 }
 
 resource "azurerm_subnet" "private_subnet" {
