@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- job: 'TerraformInitPlan'
+- job: 'TerraformInitPlanApply'
   steps:
     - checkout: self
 
@@ -16,12 +16,24 @@ jobs:
         installationPath: $(Agent.ToolsDirectory)/dotnet
 
     - script: |
+        # Navigate to your Terraform configuration directory
         cd $(Build.SourcesDirectory)/path/to/your/terraform/code
-        echo 'provider "azurerm" { version = "=2.0.0" }' > main.tf  # Specify the version of the Azure provider
+
+        # Specify the version of the Azure provider
+        echo 'provider "azurerm" { version = "=2.0.0" }' > main.tf
+
+        # Initialize Terraform
         terraform init
+
+        # Validate Terraform configuration
         terraform validate
-        rm -f $(Build.ArtifactStagingDirectory)/tfplan  # Remove existing plan file
+
+        # Remove existing plan file
+        rm -f $(Build.ArtifactStagingDirectory)/tfplan
+
+        # Create a new Terraform plan
         terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
+
       displayName: 'Terraform Init and Plan'
 
     - task: PublishPipelineArtifact@1
@@ -31,7 +43,7 @@ jobs:
         publishLocation: 'pipeline'
 
 - deployment: 'TerraformApply'
-  dependsOn: 'TerraformInitPlan'
+  dependsOn: 'TerraformInitPlanApply'
   pool:
     vmImage: 'ubuntu-latest'
   environment: 'YourEnvironmentName'
@@ -48,16 +60,19 @@ jobs:
               ls -la
               ls -la terraform-artifact
 
-              # Apply the new Terraform plan
+              # Apply the Terraform plan
               terraform apply -auto-approve terraform-artifact/tfplan
+
             displayName: 'Terraform Apply'
 
           - script: |
               echo "Terraform Apply completed successfully."
+
             displayName: 'Terraform Apply Success Message'
 
           - script: |
               echo "Current Directory: $(pwd)"
               echo "Contents of Artifact Directory:"
               ls -la terraform-artifact
+
             displayName: 'Debugging Info'
