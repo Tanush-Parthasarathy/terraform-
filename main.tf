@@ -67,10 +67,9 @@ resource "azurerm_network_interface" "example" {
 
   ip_configuration {
     name      = "jack-ip-config"
-    subnet_id = azurerm_subnet.private_subnet[count.index % length(azurerm_subnet.private_subnet)].id
+    subnet_id = azurerm_subnet.private_subnet[0].id  # Assuming you want the first subnet in the list
 
     private_ip_address_allocation = "Dynamic"
-    
   }
 }
 
