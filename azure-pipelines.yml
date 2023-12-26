@@ -40,7 +40,12 @@ jobs:
         - download: current
           artifact: 'terraform-artifact'
           displayName: 'Download Terraform Artifact'
+
         - script: |
             cd $(Pipeline.Workspace)/terraform-artifact
+            # Remove any existing plan files
+            rm -f tfplan
+            # Apply the Terraform plan
             terraform apply -auto-approve tfplan
+            # Add error handling and cleanup steps here
           displayName: 'Terraform Apply'
