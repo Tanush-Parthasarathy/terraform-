@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 jobs:
-- job: 'Terraform'
+- job: 'TerraformInitPlan'
   steps:
   - checkout: self
 
@@ -16,10 +16,10 @@ jobs:
       installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - script: |
-      cd $(Build.SourcesDirectory)  # Change directory to your Terraform code location
+      cd $(Build.SourcesDirectory)/path/to/your/terraform/code
       terraform init
       terraform validate
-      terraform plan -out=tfplan
+      terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
     displayName: 'Terraform Init and Plan'
 
   - task: PublishPipelineArtifact@1
@@ -28,13 +28,34 @@ jobs:
       artifact: 'terraform-artifact'
       publishLocation: 'pipeline'
 
-  - task: DownloadPipelineArtifact@2
-    inputs:
-      buildType: 'current'
-      artifactName: 'terraform-artifact'
-      downloadPath: '$(Build.SourcesDirectory)/terraform-artifact'
+- deployment: 'TerraformApply'
+  dependsOn: 'TerraformInitPlan'
+  pool:
+    vmImage: 'ubuntu-latest'
+  environment: 'YourEnvironmentName'  # Create an environment in Azure DevOps
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - download: current
+          artifact: 'terraform-artifact'
+          displayName: 'Download Terraform Artifact'
 
-  - script: |
-      cd $(Build.SourcesDirectory)/terraform-artifact
-      terraform apply -auto-approve tfplan
-    displayName: 'Terraform Apply'
+        - script: |
+            cd $(Pipeline.Workspace)
+            ls -la  # List contents of the current directory for debugging
+            ls -la terraform-artifact  # List contents of the artifact directory for debugging
+            # Apply the Terraform plan using the full path
+            terraform apply -auto-approve terraform-artifact/tfplan
+            # Add error handling and cleanup steps here
+          displayName: 'Terraform Apply'
+
+        - script: |
+            echo "Terraform Apply completed successfully."
+          displayName: 'Terraform Apply Success Message'
+
+        - script: |
+            echo "Current Directory: $(pwd)"
+            echo "Contents of Artifact Directory:"
+            ls -la terraform-artifact
+          displayName: 'Debugging Info'
