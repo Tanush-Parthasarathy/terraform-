@@ -43,11 +43,12 @@ jobs:
 
         - script: |
             cd $(Pipeline.Workspace)/terraform-artifact
+            pwd  # Print the current working directory for debugging
             ls -la  # List contents of the artifact directory for debugging
             # Remove any existing plan files
             rm -f tfplan
             # Apply the Terraform plan using the full path
-            terraform apply -auto-approve $(Pipeline.Workspace)/terraform-artifact/tfplan
+            terraform apply -auto-approve ./tfplan
             # Add error handling and cleanup steps here
           displayName: 'Terraform Apply'
 
