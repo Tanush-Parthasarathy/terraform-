@@ -1,7 +1,15 @@
 #This section configures the Azure provider for Terraform. 
 #It sets up the necessary credentials (client ID, client secret, subscription ID, and tenant ID) 
 #to authenticate with Azure.
-
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.0.0"  # Replace with the desired version
+    }
+    # Add other providers as needed
+  }
+}
 provider "azurerm" {
   features {}
   version = "=2.0.0"
