@@ -1,5 +1,5 @@
 trigger:
-- main  # Change this to your branch name if needed
+- main
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -7,27 +7,27 @@ pool:
 jobs:
 - job: 'TerraformInitPlan'
   steps:
-  - checkout: self
+    - checkout: self
 
-  - task: UseDotNet@2
-    inputs:
-      packageType: 'sdk'
-      version: '3.x'
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '3.x'
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
-  - script: |
-      cd $(Build.SourcesDirectory)/path/to/your/terraform/code
-      terraform init
-      terraform validate
-      rm -f $(Build.ArtifactStagingDirectory)/tfplan  # Remove existing plan file
-      terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
-    displayName: 'Terraform Init and Plan'
+    - script: |
+        cd $(Build.SourcesDirectory)/path/to/your/terraform/code
+        terraform init
+        terraform validate
+        rm -f $(Build.ArtifactStagingDirectory)/tfplan  # Remove existing plan file
+        terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
+      displayName: 'Terraform Init and Plan'
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)'
-      artifact: 'terraform-artifact'
-      publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'terraform-artifact'
+        publishLocation: 'pipeline'
 
 - deployment: 'TerraformApply'
   dependsOn: 'TerraformInitPlan'
@@ -38,25 +38,25 @@ jobs:
     runOnce:
       deploy:
         steps:
-        - download: current
-          artifact: 'terraform-artifact'
-          displayName: 'Download Terraform Artifact'
+          - download: current
+            artifact: 'terraform-artifact'
+            displayName: 'Download Terraform Artifact'
 
-        - script: |
-            cd $(Pipeline.Workspace)
-            ls -la  # List contents of the current directory for debugging
-            ls -la terraform-artifact  # List contents of the artifact directory for debugging
-            # Apply the Terraform plan using the full path
-            terraform apply -auto-approve terraform-artifact/tfplan
-            # Add error handling and cleanup steps here
-          displayName: 'Terraform Apply'
+          - script: |
+              cd $(Pipeline.Workspace)
+              ls -la  # List contents of the current directory for debugging
+              ls -la terraform-artifact  # List contents of the artifact directory for debugging
+              # Apply the Terraform plan using the full path
+              terraform apply -auto-approve terraform-artifact/tfplan
+              # Add error handling and cleanup steps here
+            displayName: 'Terraform Apply'
 
-        - script: |
-            echo "Terraform Apply completed successfully."
-          displayName: 'Terraform Apply Success Message'
+          - script: |
+              echo "Terraform Apply completed successfully."
+            displayName: 'Terraform Apply Success Message'
 
-        - script: |
-            echo "Current Directory: $(pwd)"
-            echo "Contents of Artifact Directory:"
-            ls -la terraform-artifact
-          displayName: 'Debugging Info'
+          - script: |
+              echo "Current Directory: $(pwd)"
+              echo "Contents of Artifact Directory:"
+              ls -la terraform-artifact
+            displayName: 'Debugging Info'
