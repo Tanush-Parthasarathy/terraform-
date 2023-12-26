@@ -48,7 +48,7 @@ jobs:
             # Remove any existing plan files
             rm -f tfplan
             # Apply the Terraform plan using the full path
-            terraform apply -auto-approve ./tfplan
+            terraform apply -auto-approve $(Pipeline.Workspace)/terraform-artifact/tfplan
             # Add error handling and cleanup steps here
           displayName: 'Terraform Apply'
 
