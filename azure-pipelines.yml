@@ -17,6 +17,7 @@ jobs:
 
     - script: |
         cd $(Build.SourcesDirectory)/path/to/your/terraform/code
+        echo 'provider "azurerm" { version = "=2.0.0" }' > main.tf  # Specify the version of the Azure provider
         terraform init
         terraform validate
         rm -f $(Build.ArtifactStagingDirectory)/tfplan  # Remove existing plan file
@@ -33,7 +34,7 @@ jobs:
   dependsOn: 'TerraformInitPlan'
   pool:
     vmImage: 'ubuntu-latest'
-  environment: 'YourEnvironmentName'  # Create an environment in Azure DevOps
+  environment: 'YourEnvironmentName'
   strategy:
     runOnce:
       deploy:
@@ -44,11 +45,11 @@ jobs:
 
           - script: |
               cd $(Pipeline.Workspace)
-              ls -la  # List contents of the current directory for debugging
-              ls -la terraform-artifact  # List contents of the artifact directory for debugging
-              # Apply the Terraform plan using the full path
+              ls -la
+              ls -la terraform-artifact
+
+              # Apply the new Terraform plan
               terraform apply -auto-approve terraform-artifact/tfplan
-              # Add error handling and cleanup steps here
             displayName: 'Terraform Apply'
 
           - script: |
