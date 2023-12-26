@@ -19,6 +19,7 @@ jobs:
       cd $(Build.SourcesDirectory)/path/to/your/terraform/code
       terraform init
       terraform validate
+      rm -f $(Build.ArtifactStagingDirectory)/tfplan  # Remove existing plan file
       terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
     displayName: 'Terraform Init and Plan'
 
