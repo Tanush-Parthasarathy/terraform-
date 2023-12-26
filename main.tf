@@ -1,56 +1,51 @@
-#This section configures the Azure provider for Terraform. 
-#It sets up the necessary credentials (client ID, client secret, subscription ID, and tenant ID) 
-#to authenticate with Azure.
+# This section configures the Azure provider for Terraform.
+# It sets up the necessary credentials (client ID, client secret, subscription ID, and tenant ID)
+# to authenticate with Azure.
 terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "=2.0.0"  # Replace with the desired version
     }
-    # Add other providers as needed
   }
 }
+
 provider "azurerm" {
   features {}
- 
+
   client_id       = var.client_id
   client_secret   = var.client_secret
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
 }
 
-
-#This retrieves information about an existing Azure resource group named "AUE-KOR-ResourceGroup-TRN01" 
-#using the azurerm_resource_group data source.
-
+# This retrieves information about an existing Azure resource group named "AUE-KOR-ResourceGroup-TRN01"
+# using the azurerm_resource_group data source.
 data "azurerm_resource_group" "existing" {
   name = "AUE-KOR-ResourceGroup-TRN01"
 }
 
-#This resource block creates an Azure Virtual Network named "jack-network" with the address space "10.0.0.0/16" 
-#in the specified resource group and location.
-
+# This resource block creates an Azure Virtual Network named "jack-network" with the address space "10.0.0.0/16"
+# in the specified resource group and location.
 resource "azurerm_virtual_network" "example" {
-  name                = "virtual_network_name"
+  name                = "jack-virtual-network"
   resource_group_name = data.azurerm_resource_group.existing.name
   location            = data.azurerm_resource_group.existing.location
-  address_prefix       = ["10.0.0.0/16"]
+  address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "public_subnet" {
-  count                = 1
-  name                 = "public-subnet-${count.index + 1}"
+  name                 = "public-subnet"
   resource_group_name  = data.azurerm_resource_group.existing.name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefix     = ["10.0.${count.index + 1}.0/24"]
+  address_prefix       = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "private_subnet" {
-  count                = 1
   name                 = "private-subnet"
   resource_group_name  = data.azurerm_resource_group.existing.name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefixes     = ["10.0.${count.index + 4}.0/24"]
+  address_prefix       = ["10.0.4.0/24"]
 }
 
 
