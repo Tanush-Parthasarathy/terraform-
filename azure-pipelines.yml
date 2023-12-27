@@ -1,30 +1,23 @@
-name: Terraform Apply
+trigger:
+- main
 
-on:
-  push:
-    branches:
-      - main
+pool:
+  vmImage: 'ubuntu-latest'
 
 jobs:
-  terraform:
-    runs-on: ubuntu-latest
+- job: Terraform
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'runtime'
+      version: '3.x'
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+  - script: |
+      echo "##vso[task.setvariable variable=TF_VAR_some_variable]your_variable_value"
+    displayName: 'Set Terraform Variables'
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        terraform_version: 0.12.29  # Replace with your desired version
-
-    - name: Terraform Init
-      run: |
-        terraform --version
-        terraform init -input=false
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false -var="some_variable=value"
-
-    - name: Terraform Show
-      run: terraform show
+  - script: |
+      terraform --version
+      terraform init
+      terraform apply -auto-approve -var="some_variable=$(TF_VAR_some_variable)"
+    displayName: 'Run Terraform'
