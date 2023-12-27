@@ -1,78 +1,30 @@
-trigger:
-- main
+name: Terraform Apply
 
-pool:
-  vmImage: 'ubuntu-latest'
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-- job: 'TerraformInitPlanApply'
-  steps:
-    - checkout: self
+  terraform:
+    runs-on: ubuntu-latest
 
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '3.x'
-        installationPath: $(Agent.ToolsDirectory)/dotnet
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-    - script: |
-        # Navigate to your Terraform configuration directory
-        cd $(Build.SourcesDirectory)/path/to/your/terraform/code
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.12.29  # Replace with your desired version
 
-        # Specify the version of the Azure provider
-        echo 'provider "azurerm" { version = "=2.0.0" }' > main.tf
+    - name: Terraform Init
+      run: |
+        terraform --version
+        terraform init -input=false
 
-        # Initialize Terraform
-        terraform init
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -input=false -var="some_variable=value"
 
-        # Validate Terraform configuration
-        terraform validate
-
-        # Remove existing plan file
-        rm -f $(Build.ArtifactStagingDirectory)/tfplan
-
-        # Create a new Terraform plan
-        terraform plan -out $(Build.ArtifactStagingDirectory)/tfplan
-
-      displayName: 'Terraform Init and Plan'
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)'
-        artifact: 'terraform-artifact'
-        publishLocation: 'pipeline'
-
-- deployment: 'TerraformApply'
-  dependsOn: 'TerraformInitPlanApply'
-  pool:
-    vmImage: 'ubuntu-latest'
-  environment: 'YourEnvironmentName'
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - download: current
-            artifact: 'terraform-artifact'
-            displayName: 'Download Terraform Artifact'
-
-          - script: |
-              cd $(Pipeline.Workspace)
-              ls -la
-              ls -la terraform-artifact
-
-              # Apply the Terraform plan
-              terraform apply -auto-approve terraform-artifact/tfplan
-
-            displayName: 'Terraform Apply'
-
-          - script: |
-              echo "Terraform Apply completed successfully."
-
-            displayName: 'Terraform Apply Success Message'
-
-          - script: |
-              echo "Current Directory: $(pwd)"
-              echo "Contents of Artifact Directory:"
-              ls -la terraform-artifact
-
-            displayName: 'Debugging Info'
+    - name: Terraform Show
+      run: terraform show
