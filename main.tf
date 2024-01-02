@@ -67,8 +67,7 @@ resource "azurerm_network_interface" "example" {
 
   ip_configuration {
     name      = "jack-ip-config"
-    subnet_id = azurerm_subnet.private_subnet[count.index].id
-
+    subnet_id = azurerm_subnet.private_subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.example[count.index].id
   }
