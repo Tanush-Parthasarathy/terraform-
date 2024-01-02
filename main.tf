@@ -232,7 +232,7 @@ It sets the version to "latest," indicating that the latest available version of
   #creation options, managed disk type, disk size, and OS type.
 
   storage_os_disk {
-    name              = "CentOS121-os-disk-vm"
+    
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
