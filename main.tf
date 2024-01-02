@@ -171,65 +171,30 @@ resource "azurerm_network_security_rule" "example_rdp_rule" {
 
 
   resource "azurerm_virtual_machine" "example" {
-  count                 = 3  # Change this to the desired number of VMs
+  count                 = 3
   name                  = "jack-virtual_machine_name-${count.index + 1}"
 
   vm_size               = "Standard_D2_v2"
   resource_group_name   = data.azurerm_resource_group.existing.name
   location              = data.azurerm_resource_group.existing.location
   network_interface_ids = [azurerm_network_interface.example[count.index].id]
-  
-    
-  
 
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2019-Datacenter"
+    version   = "latest"
+  }
 
-
-
-
-  #This specifies the image reference for the virtual machine, 
-  #determining the OS image to use based on the OS type specified.
-
-
-  /* publisher:
-For Windows OS, it sets the publisher to "MicrosoftWindowsServer."
-For Linux OS, it sets the publisher to "Canonical."
-The publisher represents the entity that created the OS image.
-
-
-offer:
-For Windows OS, it sets the offer to "WindowsServer."
-For Linux OS, it sets the offer to "UbuntuServer."
-The offer is a specific edition or version of the OS.
-
-
-sku:
-For Windows OS, it sets the SKU (stock keeping unit) to "2019-Datacenter."
-For Linux OS, it sets the SKU to "18.04-LTS."
-The SKU specifies the particular variant of the OS.
-
-version:
-It sets the version to "latest," indicating that the latest available version of the specified OS should be used.*/
-
-   storage_image_reference {
-	publisher = "MicrosoftWindowsServer"
-	offer     = "WindowsServer"
-	sku       = "2019-Datacenter"
-	version   = "latest"
-}
-
-   os_profile {
+  os_profile {
     computer_name  = "jackcomp"
     admin_username = "jackuser"
     admin_password = "Password123"
-}
-
+  }
 
   os_profile_windows_config {
     provision_vm_agent = true
   }
-
-  #This defines the OS disk for the virtual machine, specifying details like name, caching, 
-  #creation options, managed disk type, disk size, and OS type.
 
   storage_os_disk {
     name              = "osdisk-${azurerm_virtual_machine.example[count.index].name}"
@@ -237,9 +202,6 @@ It sets the version to "latest," indicating that the latest available version of
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
     disk_size_gb      = 128
-
-    
-
   }
 
   tags = {
