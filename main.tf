@@ -80,7 +80,7 @@ resource "azurerm_network_interface" "example" {
 # Create Public IP addresses
 resource "azurerm_public_ip" "example" {
   count               = 1
-  name                = "example-public-ip"
+ name                = "example-public-ip-${count.index + 1}"
   resource_group_name = data.azurerm_resource_group.existing.name
   location            = data.azurerm_resource_group.existing.location
   allocation_method   = "Dynamic"
