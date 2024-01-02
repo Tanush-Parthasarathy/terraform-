@@ -197,7 +197,7 @@ resource "azurerm_network_security_rule" "example_rdp_rule" {
   }
 
   storage_os_disk {
-    name              = "osdisk-${azurerm_virtual_machine.example[count.index].name}"
+    name              = "osdisk-${count.index + 1}"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
