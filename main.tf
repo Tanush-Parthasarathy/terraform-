@@ -70,7 +70,7 @@ resource "azurerm_network_interface" "example" {
     subnet_id = azurerm_subnet.private_subnet.id[count.index].id  # No need for index, as it's a single instance
 
      private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.example[count.index].id  # Reference to the public IP
+    public_ip_address_id          = azurerm_public_ip.example[0].id  # Reference to the public IP
   }
 }
 
