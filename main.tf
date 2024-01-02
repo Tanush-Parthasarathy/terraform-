@@ -67,10 +67,10 @@ resource "azurerm_network_interface" "example" {
 
   ip_configuration {
     name      = "jack-ip-config"
-    subnet_id = azurerm_subnet.private_subnet.id  # No need for index, as it's a single instance
+    subnet_id = azurerm_subnet.private_subnet[count.index].id
 
-     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.example[0].id  # Reference to the public IP
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.example[count.index].id
   }
 }
 
@@ -79,7 +79,7 @@ resource "azurerm_network_interface" "example" {
 
 # Create Public IP addresses
 resource "azurerm_public_ip" "example" {
-  count               = 1
+  count               = 3
  name                = "example-public-ip-${count.index + 1}"
   resource_group_name = data.azurerm_resource_group.existing.name
   location            = data.azurerm_resource_group.existing.location
