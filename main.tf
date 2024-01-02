@@ -67,12 +67,13 @@ resource "azurerm_network_interface" "example" {
 
   ip_configuration {
     name      = "jack-ip-config"
-    subnet_id = azurerm_subnet.example[count.index].id
+    subnet_id = azurerm_subnet.private_subnet[count.index].id
 
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.example[count.index].id
   }
 }
+
 
 
 #This resource block creates Azure public IP addresses for each virtual machine with dynamic allocation.
