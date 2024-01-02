@@ -60,8 +60,8 @@ resource "azurerm_subnet" "private_subnet" {
 # It also links to a public IP from the list created earlier.
 
 resource "azurerm_network_interface" "example" {
-  count               = 1
-  name                = "jack-nic"
+  count               = 3  # Update this count accordingly
+  name                = "jack-nic-${count.index + 1}"
   resource_group_name = data.azurerm_resource_group.existing.name
   location            = data.azurerm_resource_group.existing.location
 
@@ -134,7 +134,7 @@ resource "azurerm_network_security_rule" "example_outbound_rule" {
 #This resource block associates the NSG with the network interface of each virtual machine.
 
 resource "azurerm_network_interface_security_group_association" "example_nic_nsg_association" {
-  count = 1
+  count = 3  # Update this count accordingly
 
   network_interface_id      = azurerm_network_interface.example[count.index % length(azurerm_network_interface.example)].id
   network_security_group_id = azurerm_network_security_group.example_nsg.id
@@ -168,10 +168,12 @@ resource "azurerm_network_security_rule" "example_rdp_rule" {
 #sets the VM size based on user input or predefined values, and uses the specified OS type.
 
 
-resource "azurerm_virtual_machine" "example" {
 
-  count                 = 1
-  name                  = "jack-virtual_machine_name"
+
+  resource "azurerm_virtual_machine" "example" {
+  count                 = 3  # Change this to the desired number of VMs
+  name                  = "jack-virtual_machine_name-${count.index + 1}"
+
   vm_size               = "Standard_D2_v2"
   resource_group_name   = data.azurerm_resource_group.existing.name
   location              = data.azurerm_resource_group.existing.location
